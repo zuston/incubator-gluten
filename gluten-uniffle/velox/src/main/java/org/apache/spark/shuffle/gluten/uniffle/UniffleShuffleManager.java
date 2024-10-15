@@ -56,13 +56,11 @@ public class UniffleShuffleManager extends RssShuffleManager {
       } else {
         writeMetrics = context.taskMetrics().shuffleWriteMetrics();
       }
+      SparkConf conf = sparkConf.clone();
       // set rss.row.based to false to mark it as columnar shuffle
-      SparkConf conf =
-          sparkConf
-              .clone()
-              .set(
-                  RssSparkConfig.SPARK_RSS_CONFIG_PREFIX + RssSparkConfig.RSS_ROW_BASED.key(),
-                  "false");
+      conf.set(RssSparkConfig.SPARK_RSS_CONFIG_PREFIX + RssSparkConfig.RSS_ROW_BASED.key(), "false");
+      // bypass the compression
+      conf.set(RssSparkConfig.SPARK_RSS_CONFIG_PREFIX + RssClientConf.COMPRESSION_TYPE.key(), "NONE");
       return new VeloxUniffleColumnarShuffleWriter<>(
           context.partitionId(),
           rssHandle.getAppId(),
